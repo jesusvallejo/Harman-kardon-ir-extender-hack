@@ -1,29 +1,29 @@
 #!/bin/bash
 
 DIR='/proc/asound/card0/pcm0p/sub0/status'
-CMD1='python3 /root/audioControl/control1.py'
-CMD='python3 /root/audioControl/control.py'
-cat $CMD
+CMD1='wget --delete-after http://192.168.1.72/VCR1/'
+CMD='wget --delete-after http://192.168.1.72/VCR2/'
+
+
+
 content=''
 flag=1
 inicio=`cat $DIR`
 
+
 if [[ "$inicio" == "closed" ]]
-                then
-                echo "-----------------------------hola"
-        content=$new_content
+        then
         $CMD1
 else
 	$CMD
 
 fi
 
+
 while true
 do
   new_content=`cat $DIR`
-        
-		
-		
+
   if [[ "$content" != "$new_content" ]]
   then
         if [[ "$new_content" == "closed" ]]
@@ -39,5 +39,6 @@ do
         $CMD
 		fi
   fi
+    
     sleep 0.25
 done
