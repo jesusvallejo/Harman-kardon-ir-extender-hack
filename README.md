@@ -14,7 +14,7 @@ You'll have to purchase also an ir receiver in case you have another harman/kard
 
 These are the codes for hk3250:
 
-{ Standby = 0x10E03FC;
+" Standby = 0x10E03FC;
  RadioTuneUp= 0x10E21DE;
  RadioTuneDown= 0x10EA15E;
  RadioPScan= 0x10E6996;
@@ -47,7 +47,7 @@ These are the codes for hk3250:
  Display= 0x10E3BC4;
  Sleep= 0x10EDB24;
  Mute= 0x10E837C;
- }
+ "
  Also as i have a PI-based Spotify/Airplay player i wanted the receiver to dinamicly change between vcr1 ( pc use) and vcr2 (pi use), to achive this i made an script that checks if the pi is playing anything , in case it is it visits raspberrys'sIP/vcr2 and the receiver changes to vcr2 , and when it stops it visits raspberrys'sIP/vcr1 so i can use the receiver with my pc.
  
 Now it is composed of a bash loop that checks if a text file=="close" in case it is it calls a python program that visits the page, in case its diferent it calls another that visits another webpage , its far from efficient and reliable but for the moment just works. i'll update any time soon with an script that makes script booteable as a service, with no python extra archives. Also id like to add mqtt to the esp code , to control it with openhab.Also i'll update with the code to use it as a HE1000.
