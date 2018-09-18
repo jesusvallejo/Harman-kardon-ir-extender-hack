@@ -1,7 +1,3 @@
-/*********
-  Rui Santos
-  Complete project details at http://randomnerdtutorials.com  
-*********/
 
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
