@@ -49,7 +49,7 @@ These are the codes for hk3250:
  Mute= 0x10E837C;
  
  
- Also as i have a PI-based Spotify/Airplay player i wanted the receiver to dinamicly change between vcr1 ( pc use) and vcr2 (pi use), to achive this i made an script that checks if the pi is playing anything , in case it is it visits esp8266'sIP/vcr2 and the receiver changes to vcr2 , and when it stops it visits esp8266'sIP/vcr1 so i can use the receiver with my pc.
+ Also as i have a PI-based Spotify/Airplay player i wanted the receiver to dinamicly change between vcr1 ( pc use) and vcr2 (pi use), to achive this i made an script that checks if the pi is playing anything , in case it is it visits esp8266'sIP/vcr2 and the receiver changes to vcr2 , and when it stops it visits esp8266'sIP/vcr1 so i can use the receiver with my pc. 
  
-Now it is composed of a bash loop that checks if a text file=="close" in case it is visits vcr1 page, in case its diferent vcr2 , its far from efficient and reliable but for the moment just works. i'll update any time soon with an script that makes script booteable as a service. Also id like to add mqtt to the esp code , to control it with openhab.Also i'll update with the code to use it as a HE1000.
+Now it is composed of a bash loop that checks if a text file=="close" in case it is visits vcr1 page, in case its diferent vcr2 , its far from efficient and reliable but for the moment just works. i'll update any time soon with an script that makes script booteable as a service, for the time being install.sh will make the booteable service , but it has to be executed as root(big error, im trying to meke it executable by a normal user). Also id like to add mqtt to the esp code , to control it with openhab.Also i'll update with the code to use it as a HE1000.
  
