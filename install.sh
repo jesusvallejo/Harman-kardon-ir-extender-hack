@@ -4,7 +4,6 @@ echo ""
 echo "My Command Line Installer"
 echo ""
 
-# Create destination folder
 DESTINATION="/root/audioControl"
 
 if ! test -d ${DESTINATION} && ! test -w ${DESTINATION}; then  #Si no existe, crea el destino
@@ -77,7 +76,7 @@ fi
 	echo error
 	exit 666
 	fi
-# Find __ARCHIVE__ maker, read archive content and decompress it
+
 chmod +x audioControl.sh
 
 cd /etc/systemd/system/
@@ -113,7 +112,7 @@ WantedBy=multi-user.target
 
 ' > audioControl.service
 fi
-# Put your logic here (if you need)
+
 
 systemctl start audioControl.service
 systemctl enable audioControl.service
@@ -125,7 +124,7 @@ echo ""
 echo "Installation complete."
 echo ""
 
-# Exit from the script with success (0)
+
 exit 0
 
 
