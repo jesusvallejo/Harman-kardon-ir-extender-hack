@@ -1,17 +1,15 @@
-
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
-
-#ifndef UNIT_TEST
-#include <Arduino.h>
-#endif
+// Load MQTT library
+#include <PubSubClient.h>
+// Load IR library
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-
+// Data line for IR 
+#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2 in nodeMCU).
 IRsend irsend(IR_LED);  // Set the GPIO to be used to sending the message.
 
-
+// Remote codes
 uint64_t Standby = 0x10E03FC;
 uint64_t RadioTuneUp= 0x10E21DE;
 uint64_t RadioTuneDown= 0x10EA15E;
@@ -53,41 +51,124 @@ uint64_t Mute= 0x10E837C;
 const char* ssid     = "keepAway";
 const char* password = "cometa1997";
 
+// Replace with your mqtt server credentials
+const char* mqttServer = "192.168.1.6";
+const int mqttPort = 1883;
+const char* mqttUser = "jesus";
+const char* mqttPassword = "cometa1997";
+
 // Set web server port number to 80
 WiFiServer server(80);
+
+//Create a wifi client for mqtt PubSub
+WiFiClient espClient;
+PubSubClient clientmqtt(espClient);
 
 // Variable to store the HTTP request
 String header;
 
-// Auxiliar variables to store the current output state
-String output5State = "off";
-String output4State = "off";
-
-// Assign output variables to GPIO pins
 
 
 void setup() {
+  //serial setup
   Serial.begin(115200);
+  // IR setup
   irsend.begin();
   
-
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Serial.print("-.");
   }
   // Print local IP address and start web server
   Serial.println("");
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  //webServer setup 
   server.begin();
+  
+  //mqtt server setup
+  clientmqtt.setServer(mqttServer, mqttPort);
+  clientmqtt.setCallback(callback);
+  //Re/connect to mqtt server 
+    while (!clientmqtt.connected()) {
+    Serial.println("Connecting to MQTT...");
+ 
+    if (clientmqtt.connect("ESP8266Client", mqttUser, mqttPassword )) {
+ 
+      Serial.println("connected");  
+ 
+    } else {
+ 
+      Serial.print("failed with state ");
+      Serial.println(clientmqtt.state());
+      delay(2000);
+ 
+    }
+  }
+   //Conected to mqtt server succesfully
+   Serial.println("Mqtt successfully connected");
+   
+   clientmqtt.publish("esp/test", "Availability test");
+   clientmqtt.subscribe("esp/test");
+   clientmqtt.subscribe("Remote");
+   
 }
+void callback(char* topic, byte* payload, unsigned int length) {
+  char* pay ="";
+  Serial.print("Message arrived in topic: ");
+  Serial.println(topic);
+ 
+  Serial.print("Message:");
+  payload[length] = '\0';
+  
+  for (int i = 0; i <=length; i++) {
+   Serial.print((char)payload[i]);
+   pay[i]=(char)payload[i];
+  }
+  
 
+ 
+  Serial.println();
+  Serial.println("-----------------------");
+
+  if (strcoll(topic,"Remote")==0){
+     Serial.println("Remote called");
+        Serial.print("payload:");
+         Serial.println(pay);
+        if (strcoll(pay,"Standby")==0){
+         irsend.sendNEC(Standby, 32);
+         Serial.println("Standby");
+        }
+        else if (strcoll(pay,"VolumeUp")==0){
+         irsend.sendNEC(VolumeUp, 32);
+         Serial.println("VolumeUp");
+        }
+       else if (strcoll(pay,"VolumeDown")==0){
+         irsend.sendNEC(VolumeDown, 32);
+         Serial.println("VolumeDown");
+       }
+        else if (strcoll(pay,"VCR1")==0){
+         irsend.sendNEC(VCR1, 32);
+         Serial.println("VCR1");
+        }
+        else if (strcoll(pay,"VCR2")==0){
+         irsend.sendNEC(VCR2, 32);
+         Serial.println("VCR2");
+        }
+        else{
+          Serial.println("Command not known");
+          }
+    }
+  
+ 
+}
 void loop(){
+  
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
@@ -108,7 +189,7 @@ void loop(){
             client.println("Content-type:text/html");
             client.println("Connection: close");
             client.println();
-            // turns the GPIOs on and off
+            
             if (header.indexOf("GET /Standby") >= 0) {
     
         Serial.println("NEC");
@@ -182,4 +263,6 @@ void loop(){
     Serial.println("Client disconnected.");
     Serial.println("");
   }
+   
+  clientmqtt.loop();
 }
