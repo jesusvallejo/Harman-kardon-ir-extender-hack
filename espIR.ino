@@ -48,14 +48,14 @@ uint64_t Mute= 0x10E837C;
 
 
 // Replace with your network credentials
-const char* ssid     = "keepAway";
-const char* password = "cometa1997";
+const char* ssid     = "wifi";
+const char* password = "wifipass";
 
 // Replace with your mqtt server credentials
-const char* mqttServer = "192.168.1.6";
+const char* mqttServer = "mqttserverip";
 const int mqttPort = 1883;
-const char* mqttUser = "jesus";
-const char* mqttPassword = "cometa1997";
+const char* mqttUser = "mqttuser";
+const char* mqttPassword = "mqttpass";
 
 // Set web server port number to 80
 WiFiServer server(80);
