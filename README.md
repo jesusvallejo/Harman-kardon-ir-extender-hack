@@ -51,14 +51,18 @@ These are the codes for hk3250:
  
  Also as i have a PI-based Spotify/Airplay player,and ive allways wanted the receiver to dinamicly change between vcr1 ( pc use) and vcr2 (pi use), i have made an script that checks if the pi is playing anything , in case it is, pi visits esp8266'sIP/vcr2 and the receiver changes to vcr2 , and when it stops pi visits esp8266'sIP/vcr1 so i can use the receiver with my pc. 
  
-Now it is a bash loop that checks if a text file=="close" in case it is visits vcr1 page, in case its diferent vcr2 , its far from efficient and reliable but for the moment it just makes the job :). ~~i'll update any time soon with an script that makes script booteable as a service,~~for the time being install.sh will make the booteable service , but it has to be executed as root(big error!!!, im trying to make it executable by a normal user).Mqtt was added , to control it with openhab or through any mqtt publisher, you will need in adittion a mqtt server , like mosquitto( the payload handles the commands, the pipe where you publish the payload is >/Remote, and the payloads are: >Standby, VolumeUp,VolumeDown,VCR1,VCR2)
+Now it is a bash loop that checks if a text file=="close" in case it is visits vcr1 page, in case its diferent vcr2 , its far from efficient and reliable but for the moment it just makes the job :). ~~i'll update any time soon with an script that makes script booteable as a service,~~for the time being install.sh will make the booteable service , but it has to be executed as root(big error!!!, im trying to make it executable by a normal user).Mqtt was added , to control it with openhab or through any mqtt publisher, you will need in adittion a mqtt server , like mosquitto( the payload handles the commands, the pipe where you publish the payload is 
+>/Remote
+, and the payloads are: 
+>Standby, VolumeUp,VolumeDown,VCR1,VCR2
+.
 Also i'll update with the code to use it as a HE1000.
 
 
 To do list:
-[x] Install Script.
-[x] Mqtt commands support.
-[ ] Install Script (non-root support).
-[ ] HE1000 emutation.
+- [x] Install Script.
+- [x] Mqtt commands support.
+- [ ] Install Script (non-root support).
+- [ ] HE1000 emutation.
 
  
