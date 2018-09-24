@@ -4,8 +4,10 @@ Arduino web-based control for harman/kardon receivers like hk3250 with an in con
 
 hk-3250 as many other harman/kardon receivers has an in IR port for IR extenders like HE1000 that was sourced from Xantech by Harman/Kardon.It is no longer avaible, but after some studing of the schematics of the receiver i deducted that the port , a 3.5 monojack ,uses just the raw signal ,so its just:
 
+>
 modulating -> cable ->receiver(demodulating)
 (instead of reciving a demodulated signal)
+>
 
 Therefore we can capture the signals from the remote , which in this case uses 32 bits NEC encoding and send them through a 3.5 monojack  cable.If u wish to achive just the ir extension capabylity you could just capture the signal and reproduce it through that port, instead of that, we'll make a network/web-based control, so we can control it anywhere around the house.For this task we'll need a network enabled board, that is also able to modulate the signal ,i have chosen the old reliable esp8266 (in form of the NodeMCU prototiping board).We'll also use an IR library  exclusive for the esp8266 , the library was  built by https://github.com/markszabo you can find it in here:
 https://github.com/markszabo/IRremoteESP8266 
