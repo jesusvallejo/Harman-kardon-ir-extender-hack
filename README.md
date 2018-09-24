@@ -53,8 +53,10 @@ These are the codes for hk3250:
  
 Now it is a bash loop that checks if a text file=="close" in case it is visits vcr1 page, in case its diferent vcr2 , its far from efficient and reliable but for the moment it just makes the job :). ~~i'll update any time soon with an script that makes script booteable as a service,~~for the time being install.sh will make the booteable service , but it has to be executed as root(big error!!!, im trying to make it executable by a normal user).Mqtt was added , to control it with openhab or through any mqtt publisher, you will need in adittion a mqtt server , like mosquitto( the payload handles the commands, the pipe where you publish the payload is 
 >/Remote
+>
 , and the payloads are: 
 >Standby, VolumeUp,VolumeDown,VCR1,VCR2
+>
 .
 Also i'll update with the code to use it as a HE1000.
 
