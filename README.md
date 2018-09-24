@@ -66,6 +66,6 @@ To do list:
 - [x] Install Script.
 - [x] Mqtt commands support.
 - [ ] Install Script (non-root support).
-- [ ] HE1000 emutation.
+- [ ] HE1000 emulation.
 
  
