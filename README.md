@@ -4,8 +4,7 @@ Arduino web-based control for harman/kardon receivers like hk3250 with an in con
 
 hk-3250 as many other harman/kardon receivers has an in IR port for IR extenders like HE1000 that was sourced from Xantech by Harman/Kardon.It is no longer avaible, but after some studing of the schematics of the receiver i deducted that the port , a 3.5 monojack ,uses just the raw signal ,so its just:
 
->
-modulating -> cable ->receiver(demodulating)
+>modulating -> cable ->receiver(demodulating)
 (instead of reciving a demodulated signal)
 >
 
