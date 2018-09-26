@@ -45,17 +45,19 @@ uint64_t Sleep= 0x10EDB24;
 uint64_t Mute= 0x10E837C;
 
 
-
-
+// Replace with 'false' in case you don't use mqtt(default true)
+bool connectToMqtt= true;
+int counter=0;
+// Dont let mqtt hijak service
 // Replace with your network credentials
-const char* ssid     = "wifi";
-const char* password = "wifipass";
+const char* ssid     = "keepAway";
+const char* password = "cometa1997";
 
 // Replace with your mqtt server credentials
-const char* mqttServer = "mqttserverip";
+const char* mqttServer = "192.168.1.7";
 const int mqttPort = 1883;
-const char* mqttUser = "mqttuser";
-const char* mqttPassword = "mqttpass";
+const char* mqttUser = "jesus";
+const char* mqttPassword = "cometa1997";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -95,28 +97,60 @@ void setup() {
   clientmqtt.setServer(mqttServer, mqttPort);
   clientmqtt.setCallback(callback);
   //Re/connect to mqtt server 
-    while (!clientmqtt.connected()) {
-    Serial.println("Connecting to MQTT...");
+  mqttConnect(connectToMqtt); 
+   
+}
+char* transformMqttConnect(bool State){
+  if (State){
+    return "Connected"; 
+  }
+  else{
+    return "Failed connecting";
+  }
+  
+}
+
+void mqttConnect(bool connectToMqtt){
+  
+ 
+  if(connectToMqtt){
+  
+  
+  while (!clientmqtt.connected() && counter<5) {
+    
+  
+  Serial.print("Connecting to MQTT...");
+  Serial.print("   Attempt: ");
+  Serial.print(counter+1);
+  Serial.print("/5... ");
  
     if (clientmqtt.connect("ESP8266Client", mqttUser, mqttPassword )) {
- 
-      Serial.println("connected");  
+       if(clientmqtt.connected()){
+              Serial.println("Mqtt successfully connected");
+              clientmqtt.publish("esp/test", "Availability test");
+              clientmqtt.subscribe("esp/test");
+              clientmqtt.subscribe("Remote");  
+              counter=0;
+        }
+        else{
+          counter++;
+          }
+
  
     } else {
- 
-      Serial.print("failed with state ");
+    counter++;
+      Serial.print("Failed with state ");
       Serial.println(clientmqtt.state());
       delay(2000);
  
-    }
+    
   }
    //Conected to mqtt server succesfully
-   Serial.println("Mqtt successfully connected");
    
-   clientmqtt.publish("esp/test", "Availability test");
-   clientmqtt.subscribe("esp/test");
-   clientmqtt.subscribe("Remote");
-   
+  }
+  
+  }
+  
 }
 void callback(char* topic, byte* payload, unsigned int length) {
   char* pay ="";
@@ -168,14 +202,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
  
 }
 void loop(){
-  
+ 
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
     Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected()) {            // loop while the client's connected
-      if (client.available()) {             // if there's bytes to read from the client,
+    
+  
+  while (client.connected()) {            // loop while the client's connected
+     
+    if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
         Serial.write(c);                    // print it out the serial monitor
         header += c;
@@ -213,6 +250,12 @@ void loop(){
               irsend.sendNEC(VCR2, 32);
               
             }
+            else if (header.indexOf("GET /MQTT") >= 0) {
+              Serial.println("MQTT");
+              counter=0;
+              mqttConnect(connectToMqtt);
+              delay(2000);
+            }
             
             // Display the HTML web page
             client.println("<!DOCTYPE html><html>");
@@ -228,6 +271,14 @@ void loop(){
             
             // Web Page Heading
             client.println("<body><h1>Harman/Kardon Wireless Control</h1>");
+            client.print("<body><h2>MQTT STATE: ");
+            client.print(transformMqttConnect(clientmqtt.connected()));
+             client.println("</h2>");
+             if (!clientmqtt.connected()){
+              client.println("<p><a href=\"/MQTT\"><button class=\"button\">MQTT</button></a></p>");
+
+              
+              }
             
        
             
@@ -251,7 +302,8 @@ void loop(){
           
 
         } 
-      }else if (c != '\r') {  // if you got anything else but a carriage return character,
+      }
+    else if (c != '\r') {  // if you got anything else but a carriage return character,
           currentLine += c;      // add it to the end of the currentLine
         }
       }
@@ -263,6 +315,8 @@ void loop(){
     Serial.println("Client disconnected.");
     Serial.println("");
   }
-   
+    
   clientmqtt.loop();
+    
 }
+
