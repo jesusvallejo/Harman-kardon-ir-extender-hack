@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR='/proc/asound/card0/pcm0p/sub0/status'
-CMD1='wget --delete-after http://192.168.1.72/VCR1/'
+CMD1='wget --delete-after http://192.168.1.72/special/'
 CMD='wget --delete-after http://192.168.1.72/VCR2/'
 
 
