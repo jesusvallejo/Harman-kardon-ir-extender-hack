@@ -1,12 +1,11 @@
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
-// Load MQTT library
-#include <PubSubClient.h>
+
 // Load IR library
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 // Data line for IR 
-#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2 in nodeMCU).
+#define IR_LED 16  // ESP8266 GPIO pin to use. Recommended: 4 (D2 in nodeMCU).
 IRsend irsend(IR_LED);  // Set the GPIO to be used to sending the message.
 
 // Remote codes
@@ -45,42 +44,47 @@ uint64_t Sleep= 0x10EDB24;
 uint64_t Mute= 0x10E837C;
 
 
-// Replace with 'false' in case you don't use mqtt(default true)
-bool connectToMqtt= true;
 int counter=0;
-// Dont let mqtt hijak service
 // Replace with your network credentials
 const char* ssid     = "keepAway";
 const char* password = "cometa1997";
 
-// Replace with your mqtt server credentials
-const char* mqttServer = "192.168.1.7";
-const int mqttPort = 1883;
-const char* mqttUser = "jesus";
-const char* mqttPassword = "cometa1997";
 
 // Set web server port number to 80
 WiFiServer server(80);
 
-//Create a wifi client for mqtt PubSub
-WiFiClient espClient;
-PubSubClient clientmqtt(espClient);
+
 
 // Variable to store the HTTP request
 String header;
-
-
+int ledUp = 5;
+int ledDown = 4;
+int ledUpState=0;
+int ledDownState=0;
+int previousState=-1;
+int actualState=-1;
+int PledUpState=0;
 
 void setup() {
   //serial setup
   Serial.begin(115200);
   // IR setup
   irsend.begin();
+
+
+  pinMode(ledUp, INPUT);
+  pinMode(ledDown, INPUT);
+  pinMode(ledUp, LOW);
+  pinMode(ledDown, LOW);
   
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
+  IPAddress ip(192,168,1,72);   
+  IPAddress gateway(192,168,1,1);   
+  IPAddress subnet(255,255,255,0);   
+  WiFi.config(ip, gateway, subnet);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print("-.");
@@ -93,116 +97,40 @@ void setup() {
   //webServer setup 
   server.begin();
   
-  //mqtt server setup
-  clientmqtt.setServer(mqttServer, mqttPort);
-  clientmqtt.setCallback(callback);
-  //Re/connect to mqtt server 
-  mqttConnect(connectToMqtt); 
-   
-}
-char* transformMqttConnect(bool State){
-  if (State){
-    return "Connected"; 
-  }
-  else{
-    return "Failed connecting";
-  }
-  
 }
 
-void mqttConnect(bool connectToMqtt){
-  
- 
-  if(connectToMqtt){
-  
-  
-  while (!clientmqtt.connected() && counter<5) {
-    
-  
-  Serial.print("Connecting to MQTT...");
-  Serial.print("   Attempt: ");
-  Serial.print(counter+1);
-  Serial.print("/5... ");
- 
-    if (clientmqtt.connect("ESP8266Client", mqttUser, mqttPassword )) {
-       if(clientmqtt.connected()){
-              Serial.println("Mqtt successfully connected");
-              clientmqtt.publish("esp/test", "Availability test");
-              clientmqtt.subscribe("esp/test");
-              clientmqtt.subscribe("Remote");  
-              counter=0;
-        }
-        else{
-          counter++;
-          }
 
- 
-    } else {
-    counter++;
-      Serial.print("Failed with state ");
-      Serial.println(clientmqtt.state());
-      delay(2000);
- 
-    
-  }
-   //Conected to mqtt server succesfully
-   
-  }
+///////////////////////////////////////////////
+void loop(){
+  PledUpState=ledUpState;
+  ledUpState = digitalRead(ledUp);
+  if(PledUpState!=ledUpState)
+  Serial.println(ledUpState);
   
-  }
-  
-}
-void callback(char* topic, byte* payload, unsigned int length) {
-  char* pay ="";
-  Serial.print("Message arrived in topic: ");
-  Serial.println(topic);
- 
-  Serial.print("Message:");
-  payload[length] = '\0';
-  
-  for (int i = 0; i <=length; i++) {
-   Serial.print((char)payload[i]);
-   pay[i]=(char)payload[i];
-  }
-  
-
- 
-  Serial.println();
-  Serial.println("-----------------------");
-
-  if (strcoll(topic,"Remote")==0){
-     Serial.println("Remote called");
-        Serial.print("payload:");
-         Serial.println(pay);
-        if (strcoll(pay,"Standby")==0){
-         irsend.sendNEC(Standby, 32);
-         Serial.println("Standby");
-        }
-        else if (strcoll(pay,"VolumeUp")==0){
-         irsend.sendNEC(VolumeUp, 32);
-         Serial.println("VolumeUp");
-        }
-       else if (strcoll(pay,"VolumeDown")==0){
-         irsend.sendNEC(VolumeDown, 32);
-         Serial.println("VolumeDown");
-       }
-        else if (strcoll(pay,"VCR1")==0){
-         irsend.sendNEC(VCR1, 32);
-         Serial.println("VCR1");
-        }
-        else if (strcoll(pay,"VCR2")==0){
-         irsend.sendNEC(VCR2, 32);
-         Serial.println("VCR2");
-        }
-        else{
-          Serial.println("Command not known");
-          }
+  if (ledUpState== HIGH){// activado
+     previousState=actualState;
+     actualState=1;
     }
   
- 
-}
-void loop(){
- 
+  if (ledUpState==LOW){// apagado
+    
+    previousState=actualState;
+    actualState=0;
+    
+    }
+    if(actualState==0 && previousState==1){
+    // standBy
+    irsend.sendNEC(Standby, 32);
+    previousState=actualState;
+    delay(2000);
+    }
+     if(actualState==1 && previousState==0){
+    // vcr1
+    irsend.sendNEC(VCR1, 32);
+    previousState=actualState;
+    delay(2000);
+     }
+  
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
@@ -211,8 +139,7 @@ void loop(){
     
   
   while (client.connected()) {            // loop while the client's connected
-     
-    if (client.available()) {             // if there's bytes to read from the client,
+    if (client.available()) {
         char c = client.read();             // read a byte, then
         Serial.write(c);                    // print it out the serial monitor
         header += c;
@@ -229,34 +156,48 @@ void loop(){
             
             if (header.indexOf("GET /Standby") >= 0) {
     
-        Serial.println("NEC");
+        Serial.println("Standby");
         irsend.sendNEC(Standby, 32);
               
             } else if (header.indexOf("GET /VolumeUp") >= 0) {
-              Serial.println("NEC");
+              Serial.println("VolumeUp");
         irsend.sendNEC(VolumeUp, 32);
               
             } else if (header.indexOf("GET /VolumeDown") >= 0) {
-             Serial.println("NEC");
+             Serial.println("VolumeDown");
         irsend.sendNEC(VolumeDown, 32);
               
             } else if (header.indexOf("GET /VCR1") >= 0) {
-              Serial.println("NEC");
+              Serial.println("VCR1");
         irsend.sendNEC(VCR1, 32);
               
             
       } else if (header.indexOf("GET /VCR2") >= 0) {
-              Serial.println("NEC");
+              Serial.println("VCR2");
               irsend.sendNEC(VCR2, 32);
               
             }
-            else if (header.indexOf("GET /MQTT") >= 0) {
-              Serial.println("MQTT");
-              counter=0;
-              mqttConnect(connectToMqtt);
-              delay(2000);
+            else if (header.indexOf("GET /special") >= 0) {
+              Serial.println("special");
+              Serial.print("actualState: ");
+              Serial.println(actualState);
+              Serial.print("previousState: ");
+              Serial.println(previousState);
+
+              if (actualState==0 && previousState==0){
+              Serial.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
+              irsend.sendNEC(Standby, 32);
+   
+              }
+              else{
+                Serial.println("-------------------------------------------------------");
+              irsend.sendNEC(VCR1, 32);
+              
+              }
             }
             
+            
+            Serial.println("show web");
             // Display the HTML web page
             client.println("<!DOCTYPE html><html>");
             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -271,22 +212,18 @@ void loop(){
             
             // Web Page Heading
             client.println("<body><h1>Harman/Kardon Wireless Control</h1>");
-            client.print("<body><h2>MQTT STATE: ");
-            client.print(transformMqttConnect(clientmqtt.connected()));
-             client.println("</h2>");
-             if (!clientmqtt.connected()){
-              client.println("<p><a href=\"/MQTT\"><button class=\"button\">MQTT</button></a></p>");
-
+       
               
-              }
+              
             
        
             
-            client.println("<p><a href=\"/Standby\"><button class=\"button\">Standby</button></a></p>");
+      client.println("<p><a href=\"/Standby\"><button class=\"button\">Standby</button></a></p>");
       client.println("<p><a href=\"/VolumeUp\"><button class=\"button\">VolumeUp</button></a></p>");
       client.println("<p><a href=\"/VolumeDown\"><button class=\"button\">VolumeDown</button></a></p>");
-            client.println("<p><a href=\"/VCR1\"><button class=\"button\">VCR1</button></a></p>");
+      client.println("<p><a href=\"/VCR1\"><button class=\"button\">VCR1</button></a></p>");
       client.println("<p><a href=\"/VCR2\"><button class=\"button\">VCR2</button></a></p>");
+      client.println("<p><a href=\"/special\"><button class=\"button\">special</button></a></p>");
 
 
             client.println("</body></html>");
@@ -301,12 +238,13 @@ void loop(){
             currentLine = "";
           
 
-        } 
-      }
+           }
+    }
     else if (c != '\r') {  // if you got anything else but a carriage return character,
           currentLine += c;      // add it to the end of the currentLine
-        }
+        
       }
+    }
     }
     // Clear the header variable
     header = "";
@@ -315,8 +253,6 @@ void loop(){
     Serial.println("Client disconnected.");
     Serial.println("");
   }
-    
-  clientmqtt.loop();
-    
+ 
+ 
 }
-
