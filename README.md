@@ -1,6 +1,8 @@
 # Harman-kardon-ir-extender-hack
 Arduino web-based control for harman/kardon receivers like hk3250 with an in control port.
 
+Warning
+this fork uses different pins from master(d0--- ir aka gpio16 , d1 --- hdmi detection aka gpio5)
 
 hk-3250 as many other harman/kardon receivers has an in IR port for IR extenders like HE1000 that was sourced from Xantech by Harman/Kardon.It is no longer avaible, but after some studing of the schematics of the receiver i deducted that the port , a 3.5 monojack ,uses just the raw signal ,so its just:
 
@@ -65,7 +67,9 @@ The payloads are:
 Also i'll update with the code to use it as a HE1000.
 To do list:
 - [x] Install Script.
-- [x] Mqtt commands support.
+- [x] Power saving measures (hdmi detection)
+- [x] improved state's migration
+- [ ] Mqtt commands support.
 - [ ] Install Script (non-root support).
 - [ ] HE1000 emulation.
 
