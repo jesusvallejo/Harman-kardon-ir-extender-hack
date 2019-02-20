@@ -67,7 +67,7 @@ The payloads are:
 To do list:
 - [x] Install Script.
 - [x] Mqtt commands support.
-- [ ] Install Script (non-root support).~~
-- [ ] HE1000 emulation.~~ this is deprecated , as is easily achivable with IRremoteESP8266 library.
+- [ ] Install Script (non-root support).
+~~- [ ] HE1000 emulation.~~ this is deprecated , as is easily achivable with IRremoteESP8266 library.
 
  
