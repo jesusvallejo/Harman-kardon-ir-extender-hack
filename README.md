@@ -64,13 +64,14 @@ The payloads are:
 >Standby, VolumeUp,VolumeDown,VCR1,VCR2
 >
 
-Also i'll update with the code to use it as a HE1000.
+~~Also i'll update with the code to use it as a HE1000.~~
+
 To do list:
 - [x] Install Script.
 - [x] Power saving measures (hdmi detection)
 - [x] improved state's migration
 - [ ] Mqtt commands support.
 - [ ] Install Script (non-root support).
-- [ ] HE1000 emulation.
+- [ ] ~~HE1000 emulation.~~ Deprecated in Master
 
  
