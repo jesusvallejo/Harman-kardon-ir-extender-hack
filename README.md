@@ -63,10 +63,11 @@ The payloads are:
 >
 
 ~~Also i'll update with the code to use it as a HE1000.~~ 
+
 To do list:
 - [x] Install Script.
 - [x] Mqtt commands support.
-- [ ] Install Script (non-root support).
-~~- [ ] HE1000 emulation.~~ this is deprecated , as is easily achivable with IRremoteESP8266 library.
+- [ ] Install Script (non-root support).~~
+- [ ] HE1000 emulation.~~ this is deprecated , as is easily achivable with IRremoteESP8266 library.
 
  
