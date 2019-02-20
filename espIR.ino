@@ -1,12 +1,18 @@
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
-
 // Load IR library
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 // Data line for IR 
-#define IR_LED 16  // ESP8266 GPIO pin to use. Recommended: 4 (D2 in nodeMCU).
+#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2 in nodeMCU).
 IRsend irsend(IR_LED);  // Set the GPIO to be used to sending the message.
+
+int ledUp = 5;// hdmi detection pin
+int ledUpState=0;
+int previousState=-1;
+int actualState=-1;
+int PrevLedUpState=0;
+
 
 // Remote codes
 uint64_t Standby = 0x10E03FC;
@@ -44,67 +50,40 @@ uint64_t Sleep= 0x10EDB24;
 uint64_t Mute= 0x10E837C;
 
 
-int counter=0;
 // Replace with your network credentials
-const char* ssid     = "keepAway";
-const char* password = "cometa1997";
-
-
+const char* ssid     = "wifiName";
+const char* password = "password";
+IPAddress ip(192,168,1,72);// if this ip is changed, it must be changed in install.sh(or output-monitor.sh)   
+IPAddress gateway(192,168,1,1);   
+IPAddress subnet(255,255,255,0); 
 // Set web server port number to 80
 WiFiServer server(80);
-
-
-
 // Variable to store the HTTP request
 String header;
-int ledUp = 5;
-int ledDown = 4;
-int ledUpState=0;
-int ledDownState=0;
-int previousState=-1;
-int actualState=-1;
-int PledUpState=0;
+
 
 void setup() {
   //serial setup
   Serial.begin(115200);
   // IR setup
   irsend.begin();
-
-
+  // HDMI Detection (pullup resistor)
   pinMode(ledUp, INPUT);
-  pinMode(ledDown, INPUT);
   pinMode(ledUp, LOW);
-  pinMode(ledDown, LOW);
-  
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
-  IPAddress ip(192,168,1,72);   
-  IPAddress gateway(192,168,1,1);   
-  IPAddress subnet(255,255,255,0);   
   WiFi.config(ip, gateway, subnet);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print("-.");
-  }
-  // Print local IP address and start web server
-  Serial.println("");
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
   //webServer setup 
   server.begin();
-  
 }
 
-
-///////////////////////////////////////////////
-void loop(){
-  PledUpState=ledUpState;
-  ledUpState = digitalRead(ledUp);
-  if(PledUpState!=ledUpState)
+void hdmiDetection(){
+	PrevLedUpState=ledUpState;
+	ledUpState = digitalRead(ledUp);
+  
+  if(PrevLedUpState!=ledUpState)
   Serial.println(ledUpState);
   
   if (ledUpState== HIGH){// activado
@@ -130,7 +109,13 @@ void loop(){
     previousState=actualState;
     delay(2000);
      }
+}
+
+
+///////////////////////////////////////////////
+void loop(){
   
+  hdmiDetection();
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
@@ -155,45 +140,41 @@ void loop(){
             client.println();
             
             if (header.indexOf("GET /Standby") >= 0) {
-    
-        Serial.println("Standby");
-        irsend.sendNEC(Standby, 32);
+				Serial.println("Standby");
+				irsend.sendNEC(Standby, 32);
               
             } else if (header.indexOf("GET /VolumeUp") >= 0) {
-              Serial.println("VolumeUp");
-        irsend.sendNEC(VolumeUp, 32);
+                Serial.println("VolumeUp");
+				irsend.sendNEC(VolumeUp, 32);
               
             } else if (header.indexOf("GET /VolumeDown") >= 0) {
-             Serial.println("VolumeDown");
-        irsend.sendNEC(VolumeDown, 32);
+				Serial.println("VolumeDown");
+				irsend.sendNEC(VolumeDown, 32);
               
             } else if (header.indexOf("GET /VCR1") >= 0) {
-              Serial.println("VCR1");
-        irsend.sendNEC(VCR1, 32);
+				Serial.println("VCR1");
+				irsend.sendNEC(VCR1, 32);
               
             
-      } else if (header.indexOf("GET /VCR2") >= 0) {
-              Serial.println("VCR2");
-              irsend.sendNEC(VCR2, 32);
+			} else if (header.indexOf("GET /VCR2") >= 0) {
+				Serial.println("VCR2");
+				irsend.sendNEC(VCR2, 32);
               
             }
             else if (header.indexOf("GET /special") >= 0) {
-              Serial.println("special");
-              Serial.print("actualState: ");
-              Serial.println(actualState);
-              Serial.print("previousState: ");
-              Serial.println(previousState);
+				Serial.println("special");
+				Serial.print("actualState: ");
+				Serial.println(actualState);
+				Serial.print("previousState: ");
+				Serial.println(previousState);
 
-              if (actualState==0 && previousState==0){
-              Serial.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
-              irsend.sendNEC(Standby, 32);
-   
-              }
-              else{
-                Serial.println("-------------------------------------------------------");
-              irsend.sendNEC(VCR1, 32);
+				if (actualState==0 && previousState==0){
+				irsend.sendNEC(Standby, 32);
+				}
+				else{
+				irsend.sendNEC(VCR1, 32);
               
-              }
+				}
             }
             
             
@@ -208,24 +189,15 @@ void loop(){
             client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println(".button2 {background-color: #77878A;}</style></head>");
-            
-            
             // Web Page Heading
             client.println("<body><h1>Harman/Kardon Wireless Control</h1>");
-       
-              
-              
-            
-       
-            
-      client.println("<p><a href=\"/Standby\"><button class=\"button\">Standby</button></a></p>");
-      client.println("<p><a href=\"/VolumeUp\"><button class=\"button\">VolumeUp</button></a></p>");
-      client.println("<p><a href=\"/VolumeDown\"><button class=\"button\">VolumeDown</button></a></p>");
-      client.println("<p><a href=\"/VCR1\"><button class=\"button\">VCR1</button></a></p>");
-      client.println("<p><a href=\"/VCR2\"><button class=\"button\">VCR2</button></a></p>");
-      client.println("<p><a href=\"/special\"><button class=\"button\">special</button></a></p>");
-
-
+			// Web page buttons 
+			client.println("<p><a href=\"/Standby\"><button class=\"button\">Standby</button></a></p>");
+			client.println("<p><a href=\"/VolumeUp\"><button class=\"button\">VolumeUp</button></a></p>");
+			client.println("<p><a href=\"/VolumeDown\"><button class=\"button\">VolumeDown</button></a></p>");
+			client.println("<p><a href=\"/VCR1\"><button class=\"button\">VCR1</button></a></p>");
+			client.println("<p><a href=\"/VCR2\"><button class=\"button\">VCR2</button></a></p>");
+			client.println("<p><a href=\"/special\"><button class=\"button\">special</button></a></p>");
             client.println("</body></html>");
             
             // The HTTP response ends with another blank line
