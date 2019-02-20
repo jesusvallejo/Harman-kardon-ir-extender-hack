@@ -8,12 +8,12 @@ This fork uses different pins from master(d0--- ir aka gpio16 , d1 --- hdmi dete
 This fork implements hdmi source detection via TMDS361B(texas instruments,https://www.ti.com/lit/ds/symlink/tmds361b.pdf) HDP 1 to 3 pins
 wich is 3.3v when an input is detected.GPIO5 & gnd are used with an internal pullup resistor to detect if the hdmi is working(wich means pc is in use), so when pc is powered up , the screen is detected and ampli is powered on , if pc is shutted down , hmdi detection is lost , and the apli is powered off, this is integrated along with the audio detection for the airplay/spotify box.
 
-pc off ------------------ Standby = 0x10E03FC;<br />
-pc on ------------------- VCR1= 0x10E53AC;<br />
-pc off + spotify on ----- VCR2= 0x10ED32C;<br />
-pc on  + spotify on ----- VCR2= 0x10ED32C;<br />
-pc off + spotify off ---- Standby = 0x10E03FC;<br />
-pc on  + spotify off ---- VCR1= 0x10E53AC;<br />
+pc off ------------------  Standby = 0x10E03FC;<br />
+pc on -------------------  VCR1= 0x10E53AC;<br />
+pc off + spotify on -----  VCR2= 0x10ED32C;<br />
+pc on  + spotify on -----  VCR2= 0x10ED32C;<br />
+pc off + spotify off ----  Standby = 0x10E03FC;<br />
+pc on  + spotify off ----  VCR1= 0x10E53AC;<br />
 
 hk-3250 as many other harman/kardon receivers has an in IR port for IR extenders like HE1000 that was sourced from Xantech by Harman/Kardon.It is no longer avaible, but after some studing of the schematics of the receiver i deducted that the port , a 3.5 monojack ,uses just the raw signal ,so its just:
 
