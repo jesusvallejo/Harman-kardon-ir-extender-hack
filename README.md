@@ -1,4 +1,9 @@
 # Harman-kardon-ir-extender-hack
+
+
+VERY EARLY STAGE, VARELY WORKS, IT WORKS ONLY IF YOU SET IT UP WITH TOMCAT 9 , NOW TRYING TO DEVELOPE THE ALLTIME LISTENING IF ANITHING IS PLAYING(DOING IT WITH A THREAD, NOT SURE IF IS THE BEST WAY TO DO IT THOUGH)
+IR.WAR IS THE FILE TO RUN IN RPI
+
 java web-based control for harman/kardon receivers like hk3250 with an in control port.
 
 
