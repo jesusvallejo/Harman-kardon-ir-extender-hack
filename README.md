@@ -70,5 +70,5 @@ To do list:
 - [x] Mqtt commands support.
 - [ ] Install Script (non-root support).
 - [ ] ~~HE1000 emulation.~~ this is deprecated , as is easily achivable with IRremoteESP8266 library.
-- [ ] Port to java son everything works on rpi(neater package than rpi + arduino) 
+- [ ] Port to java so everything works on rpi(neater package than rpi + arduino) 
  
