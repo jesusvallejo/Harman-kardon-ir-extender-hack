@@ -53,7 +53,7 @@ These are the codes for hk3250:
  
  Also as i have a PI-based Spotify/Airplay player,and ive allways wanted the receiver to dinamicly change between vcr1 ( pc use) and vcr2 (pi use)~~,i have made an script that checks if the pi is playing anything , in case it is, pi visits esp8266'sIP/vcr2 and the receiver changes to vcr2 , and when it stops pi visits esp8266'sIP/vcr1 so i can use the receiver with my pc. Check hdmiES build for energy saving 
  measures.~~
- Now everithing should work in rpi, using apache tomcat server , java and a rpi.
+ Now everything should work in rpi, using apache tomcat server , java and a rpi.
  
 ~~The script runs in bash ,in a loop checks if the content of text file=="closed" in case its true visits vcr1 page, in case its false means its playing something so visits vcr2 , its far from efficient and reliable but for the moment it just makes the job :). i'll update any time soon with an script that makes script booteable as a service, for the time being install.sh will make the booteable service , but it has to be executed as root(big error!!!, im trying to make it executable by a normal user).Mqtt was added , to control it with openhab or through any mqtt publisher, you will need in adittion a mqtt server , like mosquitto( the payload handles the commands, the pipe where you publish the payload is:
 
