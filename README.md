@@ -9,7 +9,7 @@ hk-3250 as many other harman/kardon receivers has an in IR port for IR extenders
 >
 
 Therefore we can capture the signals from the remote , which in this case uses 32 bits NEC encoding and send them through a 3.5 monojack  cable.If u wish to achive just the ir extension capabylity you could just capture the signal and reproduce it through that port, instead of that, we'll make a network/web-based control, so we can control it anywhere around the house.~~For this task we'll need a network enabled board, that is also able to modulate the signal ,i have chosen the old reliable esp8266 (in form of the NodeMCU prototiping board).We'll also use an IR library  exclusive for the esp8266 , the library was  built by https://github.com/markszabo you can find it in here:
-https://github.com/markszabo/IRremoteESP8266 
+https://github.com/markszabo/IRremoteESP8266~~
 
 ~~You'll have to purchase also an ir receiver in case you have another harman/kardon so you can record the codes from your receiver's remote.To store them you can flash the library's example sketch: irRecvDumpV2.Open serial , press all buttons and copy the serial output to a text file, you will have to extract the codes and know what each of them does as long as they are nec codes, if they are not nec , u could use the raw data.~~
 Lirc is the way to go. :)
