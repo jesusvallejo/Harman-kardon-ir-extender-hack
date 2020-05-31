@@ -90,6 +90,12 @@ void setup() {
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+    // Iniciar mDNS a direccion esp8266.local
+   if (!MDNS.begin("HarmanKardon")) 
+   {             
+     Serial.println("Error iniciando mDNS");
+   }
+   Serial.println("mDNS iniciado");
   //webServer setup 
   server.begin();
   
