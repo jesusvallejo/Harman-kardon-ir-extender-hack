@@ -64,6 +64,7 @@ The payloads are:
 >
 
 ~~Also i'll update with the code to use it as a HE1000.~~ 
+![alt text](https://github.com/jesusvallejo/Harman-kardon-ir-extender-hack/blob/master/3.5Schemejpg.jpg?raw=true)
 
 To do list:
 - [x] Install Script.
